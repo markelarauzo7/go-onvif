@@ -88,6 +88,13 @@ func (device Device) GetNetworkInterfaces() ([]NetworkInterface, error) {
 		Password: device.Password,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []NetworkInterface{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -159,6 +166,14 @@ func (device Device) SetNetworkInterfaces(networkInterface NetworkInterface) err
 					</NetworkInterface>
  			  </SetNetworkInterfaces>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 
@@ -184,6 +199,13 @@ func (device Device) GetCapabilities() (DeviceCapabilities, error) {
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return DeviceCapabilities{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
@@ -308,6 +330,13 @@ func (device Device) GetDiscoveryMode() (string, error) {
 		Password: device.Password,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return "", err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -328,6 +357,13 @@ func (device Device) GetScopes() ([]string, error) {
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []string{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
@@ -363,6 +399,13 @@ func (device Device) GetHostname() (HostnameInformation, error) {
 		Password: device.Password,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return HostnameInformation{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -386,6 +429,9 @@ func (device Device) GetHostname() (HostnameInformation, error) {
 }
 
 func (device Device) GetSystemDateAndTime() (SystemDateAndTime, error) {
+	// The ONVIF spec says this should work without a Password as we need to know any difference in the
+	// remote NVT's time relative to our own time clock
+
 	// Create SOAP
 	soap := SOAP{
 		XMLNs: deviceXMLNs,
@@ -478,6 +524,13 @@ func (device Device) SetSystemDateAndTime(systemDT SystemDateAndTime) error {
 		Body:     body,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send soap request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -500,6 +553,13 @@ func (device Device) GetNTP() (NTPInformation, error) {
 		Password: device.Password,
 		Body:     `<GetNTP xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return NTPInformation{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	ntpInformation := NTPInformation{}
 
@@ -591,6 +651,13 @@ func (device Device) SetNTP(ntpInformation NTPInformation) error {
 				</SetNTP>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send soap request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -613,6 +680,13 @@ func (device Device) SystemReboot() (string, error) {
 		Password: device.Password,
 		Body:     `<SystemReboot xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return "", err
+	}
+
+	soap.CameraTime = cameraTime
 
 	var message string
 
@@ -646,6 +720,13 @@ func (device Device) GetDNS() (DNSInformation, error) {
 	}
 
 	dnsInformation := DNSInformation{}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return DNSInformation{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// send soap request
 	response, err := soap.SendRequest(device.XAddr)
@@ -709,6 +790,13 @@ func (device Device) SetDNS(dnsInformation DNSInformation) error {
 			  </SetDNS>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send soap request
 	response, err := soap.SendRequest(device.XAddr)
 
@@ -732,6 +820,13 @@ func (device Device) GetDynamicDNS() (DynamicDNSInformation, error) {
 		Body:     `<GetDynamicDNS xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
 	result := DynamicDNSInformation{}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return DynamicDNSInformation{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// send resquest
 	response, err := soap.SendRequest(device.XAddr)
@@ -768,6 +863,13 @@ func (device Device) SetHostName(nameToken string) error {
 			   </SetHostname>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -790,6 +892,13 @@ func (device Device) GetNetworkProtocols() ([]NetworkProtocol, error) {
 		Password: device.Password,
 		Body:     `<GetNetworkProtocols xmlns:="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []NetworkProtocol{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []NetworkProtocol{}
 	// send request
@@ -838,6 +947,14 @@ func (device Device) SetNetworkProtocols(protocols []NetworkProtocol) error {
 		Password: device.Password,
 		Body:     `<SetNetworkProtocols xmlns="http://www.onvif.org/ver10/device/wsdl">` + protocolsBody + `</SetNetworkProtocols>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send soap request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -867,6 +984,13 @@ func (device Device) SetScopes(listScopes []string) error {
 		Body:     `<SetScopes xmlns="http://www.onvif.org/ver10/device/wsdl">` + scopesBody + `</SetScopes>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -895,6 +1019,13 @@ func (device Device) AddScopes(listScopes []string) error {
 		Password: device.Password,
 		Body:     `<AddScopes xmlns="http://www.onvif.org/ver10/device/wsdl">` + scopesBody + `</AddScopes>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -948,6 +1079,13 @@ func (device Device) GetNetworkDefaultGateway() (NetworkGateway, error) {
 		Body:     `<GetNetworkDefaultGateway xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return NetworkGateway{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := NetworkGateway{}
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -977,6 +1115,14 @@ func (device Device) SetNetworkDefaultGateway(defaultGateway NetworkGateway) err
 					<IPv4Address>` + defaultGateway.IPv4Address + `</IPv4Address>
  			  </SetNetworkDefaultGateway>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 
@@ -998,6 +1144,13 @@ func (device Device) GetUsers() ([]User, error) {
 		Password: device.Password,
 		Body:     `<GetUsers xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []User{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []User{}
 
@@ -1039,6 +1192,14 @@ func (device Device) SetUser(user User) error {
 					<UserLevel xmlns="http://www.onvif.org/ver10/schema">` + user.UserLevel + `</UserLevel>
 				</User></SetUser>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send soap request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -1066,6 +1227,13 @@ func (device Device) DeleteUsers(usernames []string) error {
 		Password: device.Password,
 		Body:     `<DeleteUsers xmlns="http://www.onvif.org/ver10/device/wsdl">` + usernameBody + `</DeleteUsers>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -1099,6 +1267,13 @@ func (device Device) CreateUsers(users []User) error {
 		Body:     `<CreateUsers xmlns="http://www.onvif.org/ver10/device/wsdl">` + userBody + `</CreateUsers>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -1120,6 +1295,13 @@ func (device Device) GetRelayOutputs() (RelayOutput, error) {
 		Password: device.Password,
 		Body:     `<GetRelayOutputs xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return RelayOutput{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := RelayOutput{}
 
@@ -1156,6 +1338,13 @@ func (device Device) GetZeroConfiguration() (NetworkZeroConfiguration, error) {
 		Password: device.Password,
 		Body:     `<GetZeroConfiguration xmlns="http://www.onvif.org/ver10/device/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return NetworkZeroConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := NetworkZeroConfiguration{}
 
@@ -1194,6 +1383,13 @@ func (device Device) GetServices() ([]Service, error) {
 		Password: device.Password,
 		Body:     `<GetServices xmlns="http://www.onvif.org/ver10/device/wsdl"><IncludeCapability>false</IncludeCapability></GetServices>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []Service{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []Service{}
 
@@ -1236,6 +1432,13 @@ func (device Device) GetServiceCapabilities() ([]Service, error) {
 		Password: device.Password,
 		Body:     `<GetServices xmlns="http://www.onvif.org/ver10/device/wsdl"><IncludeCapability>true</IncludeCapability></GetServices>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []Service{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []Service{}
 

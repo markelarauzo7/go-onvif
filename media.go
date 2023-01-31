@@ -2,6 +2,7 @@ package onvif
 
 import (
 	"fmt"
+
 	"github.com/golang/glog"
 )
 
@@ -19,6 +20,13 @@ func (device Device) GetProfiles() ([]MediaProfile, error) {
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []MediaProfile{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
@@ -145,6 +153,13 @@ func (device Device) GetStreamURI(profileToken, protocol string) (MediaURI, erro
 		Password: device.Password,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return MediaURI{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -179,6 +194,14 @@ func (device Device) GetSnapshot(profileToken string) (string, error) {
 				<trt:ProfileToken>` + profileToken + `</trt:ProfileToken>
 			 </trt:GetSnapshotUri>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return "", err
+	}
+
+	soap.CameraTime = cameraTime
+
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
 		return "", err
@@ -201,6 +224,14 @@ func (device Device) GetVideoEncoderConfigurations() ([]VideoEncoderConfig, erro
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []VideoEncoderConfig{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []VideoEncoderConfig{}
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -313,6 +344,13 @@ func (device Device) SetVideoEncoderConfiguration(videoEncoderConfig VideoEncode
 				</SetVideoEncoderConfiguration>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
 		return err
@@ -342,6 +380,13 @@ func (device Device) SetVideoSourceConfiguration(videoSourceConfig VideoSourceCo
 				</SetVideoSourceConfiguration>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
 		return err
@@ -360,6 +405,14 @@ func (device Device) GetCompatibleVideoEncoderConfigurations(profileToken string
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []VideoEncoderConfig{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []VideoEncoderConfig{}
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -425,6 +478,13 @@ func (device Device) GetVideoEncoderConfigurationOptions(configurationToken stri
 		Password: device.Password,
 		Body:     `<GetVideoEncoderConfigurationOptions xmlns="http://www.onvif.org/ver10/media/wsdl">` + tokenBody + `</GetVideoEncoderConfigurationOptions>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return VideoEncoderConfigurationOptions{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := VideoEncoderConfigurationOptions{}
 
@@ -520,6 +580,13 @@ func (device Device) GetGuaranteedNumberOfVideoEncoderInstances(configurationTok
 				</GetGuaranteedNumberOfVideoEncoderInstances>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return GuaranteedNumberOfVideoEncoderInstances{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := GuaranteedNumberOfVideoEncoderInstances{}
 
 	//send reuest
@@ -552,6 +619,13 @@ func (device Device) GetProfileMedia(profileToken string) (MediaProfile, error) 
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return MediaProfile{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := MediaProfile{}
 	// Send SOAP request
@@ -665,6 +739,13 @@ func (device Device) CreateProfile(profileName string, profileToken string) (Med
 				</CreateProfile>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return MediaProfile{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := MediaProfile{}
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
@@ -774,6 +855,13 @@ func (device Device) DeleteProfile(profileToken string) error {
 				</DeleteProfile>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -795,6 +883,13 @@ func (device Device) GetVideoSources() ([]VideoSource, error) {
 		Password: device.Password,
 		Body:     `<GetVideoSources xmlns="http://www.onvif.org/ver10/media/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []VideoSource{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []VideoSource{}
 
@@ -918,6 +1013,13 @@ func (device Device) GetVideoSourceConfiguration(configurationToken string) (Vid
 				</GetVideoSourceConfiguration>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return VideoSourceConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := VideoSourceConfiguration{}
 
 	// send request
@@ -960,6 +1062,13 @@ func (device Device) GetVideoSourceConfigurations() ([]VideoSourceConfiguration,
 		Password: device.Password,
 		Body:     `<GetVideoSourceConfigurations xmlns="http://www.onvif.org/ver10/media/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []VideoSourceConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []VideoSourceConfiguration{}
 
@@ -1012,6 +1121,14 @@ func (device Device) GetCompatibleVideoSourceConfigurations(profileToken string)
 					<ProfileToken>` + profileToken + `</ProfileToken>
 				</GetCompatibleVideoSourceConfigurations>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []VideoSourceConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []VideoSourceConfiguration{}
 
 	// send soap request
@@ -1071,6 +1188,13 @@ func (device Device) GetVideoSourceConfigurationOptions(configurationToken strin
 		Body:     `<GetVideoSourceConfigurationOptions xmlns="http://www.onvif.org/ver10/media/wsdl">` + tokenBody + `</GetVideoSourceConfigurationOptions>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return VideoSourceConfigurationOption{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := VideoSourceConfigurationOption{}
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -1128,6 +1252,13 @@ func (device Device) GetMetadataConfiguration(configurationToken string) (Metada
 				</GetMetadataConfiguration>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return MetadataConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := MetadataConfiguration{}
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -1173,6 +1304,13 @@ func (device Device) GetMetadataConfigurations() ([]MetadataConfiguration, error
 		Password: device.Password,
 		Body:     `<GetMetadataConfigurations xmlns="http://www.onvif.org/ver10/media/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []MetadataConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []MetadataConfiguration{}
 
@@ -1229,6 +1367,13 @@ func (device Device) GetCompatibleMetadataConfigurations(profileToken string) ([
 					<ProfileToken>` + profileToken + `</ProfileToken>
 				</GetCompatibleMetadataConfigurations>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []MetadataConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []MetadataConfiguration{}
 
@@ -1292,6 +1437,14 @@ func (device Device) GetMetadataConfigurationOptions(configurationToken string, 
 		Password: device.Password,
 		Body:     `<GetMetadataConfigurationOptions xmlns="http://www.onvif.org/ver10/media/wsdl">` + tokenBody + `</GetMetadataConfigurationOptions>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return MetadataConfigurationOptions{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := MetadataConfigurationOptions{}
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -1329,6 +1482,13 @@ func (device Device) GetAudioSources() ([]AudioSource, error) {
 		Password: device.Password,
 		Body:     `<GetAudioSources xmlns="http://www.onvif.org/ver10/media/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []AudioSource{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []AudioSource{}
 
@@ -1370,6 +1530,13 @@ func (device Device) GetAudioSourceConfiguration(configurationToken string) (Aud
 				</GetAudioSourceConfiguration>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return AudioSourceConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := AudioSourceConfiguration{}
 
 	//send request
@@ -1401,6 +1568,13 @@ func (device Device) GetAudioSourceConfigurations() ([]AudioSourceConfiguration,
 		Password: device.Password,
 		Body:     `<GetAudioSourceConfigurations xmlns="http://www.onvif.org/ver10/media/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []AudioSourceConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []AudioSourceConfiguration{}
 
@@ -1443,6 +1617,13 @@ func (device Device) GetCompatibleAudioSourceConfigurations(profileToken string)
 					<ProfileToken>` + profileToken + `</ProfileToken>
 				</GetCompatibleAudioSourceConfigurations>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []AudioSourceConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []AudioSourceConfiguration{}
 
@@ -1493,6 +1674,13 @@ func (device Device) GetAudioSourceConfigurationOptions(configurationToken strin
 		Body:     `<GetAudioSourceConfigurationOptions xmlns="http://www.onvif.org/ver10/media/wsdl">` + tokenBody + `</GetAudioSourceConfigurationOptions>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return "", err
+	}
+
+	soap.CameraTime = cameraTime
+
 	var result string
 	//send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -1524,6 +1712,13 @@ func (device Device) GetAudioEncoderConfiguration(configurationToken string) (Au
 					<ConfigurationToken>` + configurationToken + `</ConfigurationToken>
 				</GetAudioEncoderConfiguration>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return AudioEncoderConfig{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := AudioEncoderConfig{}
 	// send request
@@ -1558,6 +1753,13 @@ func (device Device) GetAudioEncoderConfigurations() ([]AudioEncoderConfig, erro
 		Password: device.Password,
 		Body:     `<GetAudioEncoderConfigurations xmlns="http://www.onvif.org/ver10/media/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []AudioEncoderConfig{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []AudioEncoderConfig{}
 	// send request
@@ -1601,6 +1803,13 @@ func (device Device) GetCompatibleAudioEncoderConfigurations(profileToken string
 					<ProfileToken>` + profileToken + `</ProfileToken>
 				</GetCompatibleAudioEncoderConfigurations>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []AudioEncoderConfig{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := []AudioEncoderConfig{}
 	// send request
@@ -1651,6 +1860,13 @@ func (device Device) GetAudioEncoderConfigurationOptions(configurationToken stri
 		Body:     `<GetAudioEncoderConfigurationOptions xmlns="http://www.onvif.org/ver10/media/wsdl">` + tokenBody + `</GetAudioEncoderConfigurationOptions>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []AudioEncoderConfigurationOption{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []AudioEncoderConfigurationOption{}
 
 	// send request
@@ -1694,6 +1910,13 @@ func (device Device) GetMasks(configurationToken string) ([]Mask, error) {
 						<ConfigurationToken>` + configurationToken + `</ConfigurationToken>
 					</GetMasks>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []Mask{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := make([]Mask, 0)
 
@@ -1764,6 +1987,13 @@ func (device Device) CreateMask(configurationToken string, pointStart, pointEnd 
 					</tr2:CreateMask>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return "", err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -1804,6 +2034,14 @@ func (device Device) UpdateMask(maskToken, configurationToken string, pointStart
 						</tr2:Mask>
 					</tr2:SetMask>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -1833,6 +2071,14 @@ func (device Device) DeleteMask(maskToken string) error {
 					<Token>` + maskToken + `</Token>
 			   </tr2:DeleteMask>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
