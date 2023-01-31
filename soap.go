@@ -5,12 +5,13 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
-	"github.com/quocson95/go-onvif/digest"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"regexp"
 	"time"
+
+	"github.com/quocson95/go-onvif/digest"
 
 	"github.com/clbanning/mxj"
 	"github.com/golang/glog"
@@ -26,6 +27,10 @@ type SOAP struct {
 	TokenAge time.Duration
 	Action   string
 	NoDebug  bool
+	// Camera's with Replay Attack Protection (eg Axis)
+	// check the time/date of ONVIF messages and they MUST be timestamped to be within 10 seconds of the Camera's time
+	// To make sure that happens, any time we want to send an authorized request we must parse Camera's systemTime first
+	CameraTime time.Time
 }
 
 // SendRequest sends SOAP request to xAddr with digest authenticate
@@ -134,7 +139,15 @@ func (soap SOAP) createRequest() string {
 func (soap SOAP) createUserToken() string {
 	nonce := uuid.New().String()
 	nonce64 := base64.StdEncoding.EncodeToString(([]byte)(nonce))
-	timestamp := time.Now().Add(soap.TokenAge).UTC().Format(time.RFC3339)
+
+	var timestamp string
+
+	if !soap.CameraTime.IsZero() {
+		timestamp = soap.CameraTime.Add(soap.TokenAge).UTC().Format(time.RFC3339)
+	} else {
+		timestamp = time.Now().Add(soap.TokenAge).UTC().Format(time.RFC3339)
+	}
+
 	token := string(nonce) + timestamp + soap.Password
 
 	sha := sha1.New()

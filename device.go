@@ -1,8 +1,11 @@
 package onvif
 
 import (
-	"github.com/golang/glog"
+	"fmt"
 	"strings"
+	"time"
+
+	"github.com/golang/glog"
 )
 
 var deviceXMLNs = []string{
@@ -19,6 +22,13 @@ func (device Device) GetInformation() (DeviceInformation, error) {
 		User:     device.User,
 		Password: device.Password,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return DeviceInformation{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// Send SOAP request
 	response, err := soap.SendRequest(device.XAddr)
@@ -43,6 +53,29 @@ func (device Device) GetInformation() (DeviceInformation, error) {
 	}
 
 	return result, nil
+}
+
+func (device Device) parseSystemDateAndTime() (time.Time, error) {
+	systemDateAndTime, err := device.GetSystemDateAndTime()
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	const layout = "2006-1-2 15:4:5"
+
+	parsedTime, err := time.Parse(layout, fmt.Sprintf("%d-%d-%d %d:%d:%d",
+		systemDateAndTime.Year,
+		systemDateAndTime.Month,
+		systemDateAndTime.Day,
+		systemDateAndTime.Hour,
+		systemDateAndTime.Minute,
+		systemDateAndTime.Second,
+	))
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return parsedTime, nil
 }
 
 // GetInformation fetch information of ONVIF camera
