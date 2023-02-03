@@ -13,6 +13,14 @@ func (device Device) GetNodes() ([]PTZNode, error) {
 		Password: device.Password,
 		Body:     `<GetNodes xmlns="http://www.onvif.org/ver20/ptz/wsdl"/>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []PTZNode{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []PTZNode{}
 
 	// send request
@@ -191,6 +199,13 @@ func (device Device) GetNode(nodeToken string) (PTZNode, error) {
 				</GetNode>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return PTZNode{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := PTZNode{}
 
 	// send request
@@ -359,6 +374,13 @@ func (device Device) GetConfigurations() ([]PTZConfiguration, error) {
 		Body:     `<GetConfigurations xmlns="http://www.onvif.org/ver20/ptz/wsdl"/>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []PTZConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []PTZConfiguration{}
 
 	//send request
@@ -464,6 +486,13 @@ func (device Device) GetConfiguration(ptzConfigurationToken string) (PTZConfigur
 				</GetConfiguration>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return PTZConfiguration{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := PTZConfiguration{}
 
 	// send response
@@ -562,6 +591,13 @@ func (device Device) GetConfigurationOptions(configurationToken string) (PTZConf
 					<ConfigurationToken>` + configurationToken + `</ConfigurationToken>
 				</GetConfigurationOptions>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return PTZConfigurationOptions{}, err
+	}
+
+	soap.CameraTime = cameraTime
 
 	result := PTZConfigurationOptions{}
 
@@ -746,6 +782,13 @@ func (device Device) GetStatus(profileToken string) (PTZStatus, error) {
 				</GetStatus>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return PTZStatus{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := PTZStatus{}
 
 	//send soap
@@ -808,6 +851,13 @@ func (device Device) ContinuousMove(profileToken string, velocity PTZVector) err
 		Action: "http://www.onvif.org/ver20/ptz/wsdl/ContinuousMove",
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	//send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -837,6 +887,13 @@ func (device Device) AbsoluteMove(profileToken string, position PTZVector) error
 		XMLNs:  ptzXMLNs,
 		Action: "http://www.onvif.org/ver20/ptz/wsdl/AbsoluteMove",
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
 
 	//send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -872,6 +929,13 @@ func (device Device) RelativeMove(profileToken string, translation PTZVector) er
 		Action: "http://www.onvif.org/ver20/ptz/wsdl/RelativeMove",
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	//send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -899,6 +963,13 @@ func (device Device) Stop(profileToken string) error {
 		Action: "http://www.onvif.org/ver20/ptz/wsdl/Stop",
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	//send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -925,6 +996,13 @@ func (device Device) GotoHomePosition(profileToken string) error {
 		Action: "http://www.onvif.org/ver20/ptz/wsdl/GotoHomePosition",
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -948,6 +1026,13 @@ func (device Device) SetHomePosition(profileToken string) error {
 					<ProfileToken>` + profileToken + `</ProfileToken>
 				</SetHomePosition>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
 
 	//send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -974,6 +1059,14 @@ func (device Device) SetPreset(profileToken string, presetName string) (string, 
 					<PresetName>` + presetName + `</PresetName>
 				</SetPreset>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return "", err
+	}
+
+	soap.CameraTime = cameraTime
+
 	var result string
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
@@ -1003,6 +1096,14 @@ func (device Device) GetPresets(profileToken string) ([]PTZPreset, error) {
 					<ProfileToken>` + profileToken + `</ProfileToken>
 				</GetPresets>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return []PTZPreset{}, err
+	}
+
+	soap.CameraTime = cameraTime
+
 	result := []PTZPreset{}
 
 	// send request
@@ -1059,6 +1160,13 @@ func (device Device) GotoPreset(profileToken string, presetToken string) error {
 				</GotoPreset>`,
 	}
 
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
+
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
 	if err != nil {
@@ -1083,6 +1191,13 @@ func (device Device) RemovePreset(profileToken string, presetToken string) error
 					<PresetToken>` + presetToken + `</PresetToken>
 				</RemovePreset>`,
 	}
+
+	cameraTime, err := device.parseSystemDateAndTime()
+	if err != nil {
+		return err
+	}
+
+	soap.CameraTime = cameraTime
 
 	// send request
 	response, err := soap.SendRequest(device.XAddr)
