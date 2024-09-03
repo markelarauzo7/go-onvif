@@ -40,22 +40,24 @@
 //	if err != nil {
 //		return err
 //	}
-//
 package digest
 
 import (
+	"bytes"
+	"context"
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"github.com/golang/glog"
 	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/golang/glog"
 )
 
 var (
@@ -252,13 +254,15 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 		return nil, ErrNilTransport
 	}
 
-	// Copy the request so we don't modify the input.
-	req2 := new(http.Request)
-	*req2 = *req
-	req2.Header = make(http.Header)
-	for k, s := range req.Header {
-		req2.Header[k] = s
+	body, err := io.ReadAll(req.Body)
+	if err != nil {
+		return nil, err
 	}
+
+	// Copy the request so we don't modify the input. Clone does not copy request body
+	req2 := req.Clone(context.Background())
+	req.Body = io.NopCloser(bytes.NewReader(body))
+	req2.Body = io.NopCloser(bytes.NewReader(body))
 
 	// Make a request to get the 401 that contains the challenge.
 	resp, err := t.Transport.RoundTrip(req)
